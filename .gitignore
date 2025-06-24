@@ -14,6 +14,8 @@ __pycache__/
 **/*env/
 Flask API/pyvenv/
 rasa/rasaenv/
+Rasa/models/
+Rasa\models
 # === Python bytecode and cache ===
 *.py[cod]
 __pycache__/
