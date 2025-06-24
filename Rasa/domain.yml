@@ -1,0 +1,142 @@
+
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - bot_challenge
+  - start_over
+  - check_product:
+      use_entities:
+        - product_name
+  - ask_price
+  - ask_features
+  - inquire_purchase
+  - ask_all_products
+  - buy_product:
+      use_entities:
+        - product_name
+        - product_quantity
+  - provide_email:
+      use_entities:
+        - user_email
+  - provide_quantity:
+      use_entities:
+        - product_quantity
+  - confirm_order
+  - deny_order
+  - get_order_history
+  - cancel_order:
+      use_entities:
+        - order_number
+  - provide_order_number:
+      use_entities:
+        - order_number
+
+entities:
+  - product_name
+  - product_quantity
+  - user_email
+  - order_number
+
+slots:
+  product_name:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: product_name
+  product_quantity:
+    type: float
+    influence_conversation: false
+    min_value: 1.0
+    max_value: 9.0
+    mappings:
+      - type: from_entity
+        entity: product_quantity
+  user_email:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: user_email
+      - type: from_text  
+        intent: provide_email
+  order_number:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: order_number
+      - type: from_text
+        intent: provide_order_number
+  summary_shown:
+    type: bool
+    influence_conversation: true
+    mappings:
+      - type: from_trigger_intent
+        intent: confirm_order
+        value: false
+      - type: from_trigger_intent
+        intent: deny_order
+        value: false
+
+forms:
+  order_form:
+    required_slots:
+      - product_name
+      - product_quantity
+      - user_email
+
+actions:
+  - action_check_product
+  - action_show_all_products
+  - action_get_price
+  - action_get_features
+  - action_place_order
+  - action_get_order_history
+  - action_cancel_order
+  - action_reset_slots
+  - validate_order_form
+  - action_show_order_summary 
+
+responses:
+  utter_greet:
+    - text: "Hello! How can I help you with our products today?"
+  utter_goodbye:
+    - text: "Goodbye! Have a great day."
+  utter_iamabot:
+    - text: "I am a bot, powered by Rasa."
+  utter_ask_next:
+    - text: "What would you like to do next with the {product_name}?"
+      buttons:
+        - title: "Price"
+          payload: /ask_price
+        - title: "Features"
+          payload: /ask_features
+        - title: "Buy this product"
+          payload: /buy_product
+  utter_order_cancelled:
+    - text: "Okay, I have cancelled the process."
+  utter_ask_product_name:
+    - text: "Which product would you like to buy?"
+  utter_ask_user_email:
+    - text: "What is your email address for order updates?"
+  utter_ask_product_quantity:
+    - text: "And how many would you like to order?"
+  utter_ask_order_number:
+    - text: "What is the order number you would like to cancel?"
+  utter_ask_email:
+    - text: "What is your email address?"
+  utter_default:
+    - text: "I'm sorry, I didn't understand that. Could you please rephrase?"
+  utter_show_order_summary:
+    - text: "Here is your order summary."
+  utter_no_products_found:
+    - text: "It seems we don't have any products available at the moment. Please check back later!"
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

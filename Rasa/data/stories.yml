@@ -1,0 +1,166 @@
+version: "3.1"
+
+stories:
+# CASE 1: Full inquiry path then buy
+- story: Case 1 - Full inquiry path
+  steps:
+    - intent: check_product
+      entities:
+        - product_name: "iPhone 16 pro"
+    - action: action_check_product
+    - intent: ask_price
+    - action: action_get_price
+    - intent: ask_features
+    - action: action_get_features
+    - action: utter_ask_next
+    - intent: buy_product
+    - action: order_form
+    - active_loop: order_form
+
+# CASE 2: Check availability then buy
+- story: Case 2 - Check then buy
+  steps:
+    - intent: check_product
+      entities:
+        - product_name: "Samsung S25"
+    - action: action_check_product
+    - intent: buy_product
+    - action: order_form
+    - active_loop: order_form
+
+# CASE 3: Check availability + price then buy
+- story: Case 3 - Check + price then buy
+  steps:
+    - intent: check_product
+      entities:
+        - product_name: "Pixel 9"
+    - action: action_check_product
+    - intent: ask_price
+    - action: action_get_price
+    - intent: buy_product
+    - action: order_form
+    - active_loop: order_form
+
+# CASE 4: Check availability + features then buy
+- story: Case 4 - Check + features then buy
+  steps:
+    - intent: check_product
+      entities:
+        - product_name: "Galaxy Fold 6"
+    - action: action_check_product
+    - intent: ask_features
+    - action: action_get_features
+    - intent: buy_product
+    - action: order_form
+    - active_loop: order_form
+
+- story: Case 5 - Get order history (email needed)
+  steps:
+    - intent: get_order_history
+    - action: action_get_order_history  # Bot asks for email here
+    - intent: provide_email
+      entities:
+        - user_email: "test@example.com"
+    - action: action_get_order_history  # Bot now has email and provides history
+
+- story: Case 5 - Get order history (email already known)
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: provide_email # User provides email early
+      entities:
+        - user_email: "test@example.com"
+    - intent: get_order_history
+    - action: action_get_order_history # Bot already has email and provides history
+
+# CASE 7: Cancel order
+- story: Case 6 - Cancel order (number needed)
+  steps:
+    - intent: cancel_order
+    - action: action_cancel_order # Bot asks for order number
+    - intent: provide_order_number
+      entities:
+        - order_number: "ORD1234"
+    - action: action_cancel_order # Bot now has number and cancels
+
+- story: Case 7 - Cancel order (number provided)
+  steps:
+    - intent: cancel_order
+      entities:
+        - order_number: "ORD5678"
+    - action: action_cancel_order
+
+# CASE 8: Order form - user provides email when asked
+- story: Case 8 - Handle email during order form
+  steps:
+    - intent: buy_product
+      entities:
+        - product_name: "Pixel 9"
+        - product_quantity: "1"
+    - action: order_form
+    - active_loop: order_form
+    - intent: provide_email  
+      entities:
+        - user_email: "test@example.com"
+    - action: order_form      
+    - active_loop: order_form
+
+# CASE 9: Cancel order (email and number needed)
+- story: Case 9 - Full cancellation path
+  steps:
+    - intent: cancel_order
+    - action: action_cancel_order  
+    - intent: provide_email
+      entities:
+        - user_email: "test@example.com"
+    - action: action_cancel_order 
+    - intent: provide_order_number
+      entities:
+        - order_number: "ABC-123"
+    - action: action_cancel_order 
+
+# CASE 10: User asks for a generic product
+- story: Handle generic purchase request
+  steps:
+    - intent: inquire_purchase
+    - action: utter_ask_product_name 
+    - intent: check_product        
+      entities:
+        - product_name: "iPhone 16 pro"
+    - action: action_check_product
+    - intent: buy_product       
+    - action: order_form
+    - active_loop: order_form
+
+- story: User asks for all products
+  steps:
+    - intent: ask_all_products
+    - action: action_show_all_products
+
+
+- story: User asks for features during the order form
+  steps:
+    - action: order_form  
+    - active_loop: order_form
+    - intent: ask_features 
+    - action: action_get_features 
+    - action: order_form 
+    - active_loop: order_form
+
+- story: User asks for price during the order form
+  steps:
+    - action: order_form  
+    - active_loop: order_form
+    - intent: ask_price 
+    - action: action_get_price
+    - action: order_form 
+    - active_loop: order_form
+
+- story: User tries to check another product during the order form
+  steps:
+    - action: order_form 
+    - active_loop: order_form
+    - intent: check_product 
+    - action: action_check_product 
+    - action: order_form 
+    - active_loop: order_form

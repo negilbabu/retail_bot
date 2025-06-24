@@ -1,0 +1,62 @@
+version: "3.1"
+rules:
+- rule: Activate order form 
+  condition: 
+  - slot_was_set:
+    - product_name: "some_specific_product"
+  steps:
+  - intent: buy_product
+  - action: order_form
+  - active_loop: order_form
+
+- rule: Handle start over
+  steps:
+  - intent: start_over
+  - action: action_reset_slots 
+  - action: utter_greet
+
+- rule: Submit order form
+  condition:
+  - active_loop: order_form
+  steps:
+  - action: order_form
+  - active_loop: null
+  - action: action_show_order_summary 
+
+- rule: Confirm order after summary
+  condition:
+  - slot_was_set:                   
+    - summary_shown: true
+  steps:
+  - intent: confirm_order
+  - action: action_place_order
+  # - action: action_reset_slots
+
+- rule: Handle order cancellation during form
+  condition:
+  - active_loop: order_form
+  steps:
+  - intent: deny_order
+  - action: utter_order_cancelled
+  - action: action_deactivate_loop
+  - active_loop: null
+  - action: action_reset_slots
+
+- rule: Deny order after summary
+  condition:
+  - slot_was_set:
+    - summary_shown: true
+  steps:
+  - intent: deny_order
+  - action: utter_order_cancelled
+  - action: action_reset_slots
+
+- rule: Handle bot challenge
+  steps:
+  - intent: bot_challenge
+  - action: utter_iamabot
+
+- rule: Handle goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye

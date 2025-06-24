@@ -1,0 +1,207 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hey
+    - hello
+    - hi
+
+- intent: goodbye
+  examples: |
+    - bye
+    - goodbye
+    - see you later
+
+- intent: affirm
+  examples: |
+    - yes
+    - indeed
+    - correct
+
+- intent: deny
+  examples: |
+    - no
+    - never
+    - not really
+
+- intent: confirm_order
+  examples: |
+    - confirm
+    - confirm order
+    - yes place order
+    - go ahead
+    - yes please
+    - looks good, confirm
+
+- intent: deny_order
+  examples: |
+    - cancel
+    - stop
+    - don't place order
+    - abort
+    - not now
+    - no cancel
+    - no cancel that
+
+- intent: bot_challenge
+  examples: |
+    - are you a bot?
+    - are you a human?
+    - am I talking to a bot?
+    - are you real?
+    - what are you?
+
+- intent: start_over
+  examples: |
+    - start over
+    - let's start again
+    - main menu
+    - reset
+    - clear everything
+
+- intent: check_product
+  examples: |
+    - Do you have [iPhone 16 pro](product_name)?
+    - Do you have [iphone 16 pro max](product_name) in stock?
+    - Do you have [iphone 16](product_name)?
+    - Do you have [IPHONE 16 PRO](product_name)?
+    - Is [Galaxy S21 ultra](product_name) available?
+    - Is [galaxy s21 ultra](product_name) available?
+    - Check stock for [iPhone 16](product_name)
+    - Is [Pixel S7](product_name) in stock?
+    - I want to know about [iPhone 14 Pro Max](product_name)
+    - Can you show me [S24 plus](product_name)?
+    - Is [16 pro](product_name) available? 
+    - do you have [Xiaomi 12T](product_name)
+    - check for [Galaxy S25 Ultra](product_name)
+    - tell me about the [oneplus 12](product_name)
+    - I want to know about [iPhone 14 Pro Max](product_name)
+    - can you show me [Samsung S24 plus](product_name)
+    - is the [Google Pixel 9](product_name) available for purchase
+    - are you selling the [Xiaomi 12T](product_name)
+
+- intent: ask_all_products
+  examples: |
+    - what all devices do you have?
+    - show me all your products
+    - list all available phones
+    - what do you sell?
+    - what are my options?
+    - can you show me everything?
+    - list all products
+
+- intent: ask_price
+  examples: |
+    - what is the price
+    - how much does it cost
+    - tell me the price of [Iphone 16 Pro Max](product_name)
+    - what's the price for the [Pixel 9](product_name)
+    - how much is a [Samsung Galaxy S25 Ultra](product_name)
+    - price for [iPhone 16](product_name)
+    - what is the cost of [16 pro](product_name)
+
+- intent: ask_features
+  examples: |
+    - what are the features
+    - tell me more about it
+    - what specs does it have
+    - can you list the features for the [Galaxy S25 ultra](product_name)?
+    - what are its specifications of [iphone 16 pro max](product_name)?
+    - give me the details on that one
+    - features
+    - could you tell me about its camera and battery?
+    - I want to know more about the [iPhone 16 pro](product_name)
+
+- intent: inquire_purchase
+  examples: |
+    - i want to purchase a phone
+    - i want to buy something
+    - i'd like to place an order
+    - can I buy a device?
+
+- intent: buy_product
+  examples: |
+    - I want to buy this
+    - I'd like to purchase this product
+    - I want to place an order
+    - I want to buy [two](product_quantity) [iPhone 16 pro](product_name)
+    - I want to buy [1](product_quantity) [iphone 16 pro max](product_name)
+    - Let's buy [one](product_quantity) of those
+    - purchase a [pixel 9](product_name)
+    - I want to purchase the [Samsung Galaxy S25 Ultra](product_name)
+    - get me a [Xiaomi 12T](product_name)
+    - I'd like to purchase a [Samsung Galaxy S25 Ultra](product_name)
+    
+
+- intent: provide_email
+  examples: |
+    - my email is [john@example.com](user_email)
+    - [jane.doe@company.org](user_email)
+    - you can reach me at [support@website.com](user_email)
+
+- intent: provide_quantity
+  examples: |
+    - I need [2](product_quantity)
+    - [3](product_quantity) pieces
+    - quantity [5](product_quantity)
+    - just [1](product_quantity)
+    - [ten](product_quantity)
+    - [1](product_quantity)
+
+- intent: get_order_history
+  examples: |
+    - show my order history
+    - can you show my past orders?
+    - view my order records
+
+- intent: cancel_order
+  examples: |
+    - I want to cancel my order
+    - cancel my order please
+    - I need to cancel order number [ORD1234](order_number)
+    - cancel order [ORD5678](order_number)
+
+- intent: provide_order_number
+  examples: |
+    - the order number is [ORD-123-XYZ](order_number)
+    - it's [ABC-456](order_number)
+    - [12345678](order_number)
+    - [A2FHSN89](order_number)
+    - [AHKDHYTR](order_number)
+    - '[CB88AE75]{"entity": "order_number", "role": "order_number_pattern"}' 
+    - '[BD4467F4]{"entity": "order_number", "role": "order_number_pattern"}'
+
+
+
+- intent: cancel_order
+  examples: |
+    - I want to cancel my order
+    - cancel my order please
+    - I need to cancel order number [ORD1234](order_number)
+    - cancel order [ORD5678](order_number)
+    # --- ADD EXAMPLES LIKE THESE ---
+    - I want to cancel my order with order number [A717C8BA]{"entity": "order_number", "role": "order_number_pattern"}
+    - please cancel order [BD4467F4]{"entity": "order_number", "role": "order_number_pattern"} for me
+    - cancel order with id [178B8EDF]{"entity": "order_number", "role": "order_number_pattern"}
+
+- intent: provide_order_number
+  examples: |
+    - the order number is [ORD-123-XYZ](order_number)
+    - it's [ABC-456](order_number)
+    # --- ADD EXAMPLES LIKE THESE ---
+    - '[CB88AE75]{"entity": "order_number", "role": "order_number_pattern"}'
+    - '[BD4467F4]{"entity": "order_number", "role": "order_number_pattern"}'
+    - it is [A2FHSN89](order_number)
+    - the id is [AHKDHYTR](order_number)
+
+# Synonyms can map different extracted values to a single canonical one
+- synonym: iPhone 16 Pro
+  examples: |
+    - iphone 16 pro
+    - 16 pro
+    - i phone 16 pro
+
+- regex: order_number_pattern
+  examples: |
+    - \b[A-Z]{2}[A-F0-9]{6}\b

@@ -6,6 +6,30 @@ __pycache__/
 # C extensions
 *.so
 
+
+# Ignore any virtual environments with common or custom names
+**/venv/
+**/env/
+**/*venv/
+**/*env/
+Flask API/pyvenv/
+rasa/rasaenv/
+# === Python bytecode and cache ===
+*.py[cod]
+__pycache__/
+*/__pycache__/
+.mypy_cache/
+.pytest_cache/
+
+
+# === Rasa-specific ===
+
+Rasa/.rasa/
+
+
+
+
+
 # Distribution / packaging
 .Python
 build/

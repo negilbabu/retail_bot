@@ -1,0 +1,34 @@
+recipe: default.v1
+assistant_id: 20250619-181744-boxy-eggs
+language: en
+
+pipeline:
+  # 1. Tokenizer
+  - name: WhitespaceTokenizer
+  # 2. Featurizers for intent classification and entity extraction
+  - name: RegexFeaturizer
+  - name: LexicalSyntacticFeaturizer
+  - name: CountVectorsFeaturizer
+  - name: CountVectorsFeaturizer
+    analyzer: char_wb
+    min_ngram: 1
+    max_ngram: 4
+
+  # 4. The main NLU model
+  - name: DIETClassifier
+    epochs: 100
+  # 5. Post-processors for entities
+  - name: EntitySynonymMapper
+  # 6. For handling FAQs or chit-chat
+  - name: ResponseSelector
+    epochs: 100
+
+policies:
+  - name: RulePolicy
+    core_fallback_threshold: 0.4
+    core_fallback_action_name: "action_default_fallback"
+    enable_fallback_prediction: true
+  - name: MemoizationPolicy
+  - name: TEDPolicy
+    max_history: 8
+    epochs: 100
