@@ -1,6 +1,7 @@
 version: "3.1"
 
 nlu:
+# 1. INTENTS
 - intent: greet
   examples: |
     - hey
@@ -119,6 +120,7 @@ nlu:
     - i want to buy something
     - i'd like to place an order
     - can I buy a device?
+    - i want to buy
 
 - intent: buy_product
   examples: |
@@ -132,13 +134,17 @@ nlu:
     - I want to purchase the [Samsung Galaxy S25 Ultra](product_name)
     - get me a [Xiaomi 12T](product_name)
     - I'd like to purchase a [Samsung Galaxy S25 Ultra](product_name)
-    
 
 - intent: provide_email
   examples: |
     - my email is [john@example.com](user_email)
     - [jane.doe@company.org](user_email)
     - you can reach me at [support@website.com](user_email)
+    - my email is [john@gmail.com](user_email)
+    - [test.user@email.co.uk](user_email)
+    - [another_email@provider.net](user_email)
+    - it is [example@domain.com](user_email)
+    - [negilbabu@gmail.com](user_email)
 
 - intent: provide_quantity
   examples: |
@@ -154,6 +160,9 @@ nlu:
     - show my order history
     - can you show my past orders?
     - view my order records
+    - List my order history
+    - What are my previous orders
+    - How many orders i made recently
 
 - intent: cancel_order
   examples: |
@@ -161,47 +170,380 @@ nlu:
     - cancel my order please
     - I need to cancel order number [ORD1234](order_number)
     - cancel order [ORD5678](order_number)
-
-- intent: provide_order_number
-  examples: |
-    - the order number is [ORD-123-XYZ](order_number)
-    - it's [ABC-456](order_number)
-    - [12345678](order_number)
-    - [A2FHSN89](order_number)
-    - [AHKDHYTR](order_number)
-    - '[CB88AE75]{"entity": "order_number", "role": "order_number_pattern"}' 
-    - '[BD4467F4]{"entity": "order_number", "role": "order_number_pattern"}'
-
-
-
-- intent: cancel_order
-  examples: |
-    - I want to cancel my order
-    - cancel my order please
-    - I need to cancel order number [ORD1234](order_number)
-    - cancel order [ORD5678](order_number)
-    # --- ADD EXAMPLES LIKE THESE ---
     - I want to cancel my order with order number [A717C8BA]{"entity": "order_number", "role": "order_number_pattern"}
     - please cancel order [BD4467F4]{"entity": "order_number", "role": "order_number_pattern"} for me
     - cancel order with id [178B8EDF]{"entity": "order_number", "role": "order_number_pattern"}
 
 - intent: provide_order_number
   examples: |
-    - the order number is [ORD-123-XYZ](order_number)
-    - it's [ABC-456](order_number)
-    # --- ADD EXAMPLES LIKE THESE ---
+    - the order number is [ORD123XYZ](order_number)
+    - it's [ABC456AS](order_number)
     - '[CB88AE75]{"entity": "order_number", "role": "order_number_pattern"}'
     - '[BD4467F4]{"entity": "order_number", "role": "order_number_pattern"}'
     - it is [A2FHSN89](order_number)
     - the id is [AHKDHYTR](order_number)
+    - it was [A951182A](order_number)
+    - my order number is [C2D57202](order_number)
+    - [B711E39F](order_number)
+    - [D93A45B1](order_number)
+    - The order number is [F44C12A8](order_number)
+    - I think it was [A717C8BA](order_number)
+    - [E55B339C](order_number)
 
-# Synonyms can map different extracted values to a single canonical one
+- intent: file_complaint
+  examples: |
+    - I want to make a complaint about my order
+    - My [iPhone 16](product_name) has a [cracked screen](problem_type)
+    - I'm really unhappy, the [battery](problem_type) on my new phone is terrible
+    - You sent me the [wrong color](problem_type) for my [Pixel 9](product_name)
+    - The [camera is blurry](problem_type) on order [A717C8BA](order_number)
+    - My phone is [overheating](problem_type) a lot
+    - The screen has a [scratch](problem_type) on it
+    - my order arrived with a cracked screen
+    - my order arrived with a [cracked screen](problem_type)
+    - the phone I received has a [scratch](problem_type)
+    - my new phone has a [camera issue](problem_type)
+    - the [battery](problem_type) is [not working](problem_type) on my device
+    - you sent me the [wrong color](problem_type)
+    - the speaker has [no sound](problem_type)
+    - the device has [speaker issue]
+    - I'm having an [audio problem](problem_type)
+    - it's a [wifi issue](problem_type)
+    - My phone's speaker has [no sound]
+    - [no sound](problem_type)
+    - [cracked screen](problem_type)
+    - [overheating issue](problem_type)
+    - [battery issue](problem_type)
+    - [won't turn on](problem_type)
+    - the [camera is blurry](problem_type)
+    - my phone arrived [broken](problem_type)
+    - the item is clearly [defective](problem_type)
+    - the [screen cracked](problem_type) after one day
+    - I have a [broken screen](problem_type)
+    - there is a deep [scratch](problem_type) on the display
+    - the body of the phone is [scuffed](problem_type) up
+    - you sent the [incorrect color](problem_type)
+    - this is [not the color i wanted](problem_type)
+    - this is the [wrong phone](problem_type)
+    - I received a [different model than I ordered](problem_type)
+    - my phone is [not working](problem_type) at all
+    - the device [won't turn on](problem_type)
+    - my [battery dies too fast](problem_type)
+    - i'm having a [charging problem](problem_type)
+    - the phone started [heating up](problem_type) a lot
+    - it [gets hot](problem_type) very quickly
+    - the [camera is not working](problem_type)
+    - my [pictures are blurry](problem_type)
+    - there is [no sound](problem_type) from the speaker
+    - the [audio is distorted](problem_type)
+    - [people cant hear me](problem_type) on calls
+    - the [mic seems to be broken](problem_type)
+    - the [charging port is loose](problem_type)
+    - my [fingerprint sensor not working](problem_type) is the issue
+    - [face id failed](problem_type)
+    - I have [no wifi](problem_type) connection
+    - my [wifi is slow](problem_type)
+    - [bluetooth not connecting](problem_type) to my car
+    - [pairing failed](problem_type) with my headphones
+    - my [mobile data isn't working](problem_type)
+    - I have [no service](problem_type)
+    - my banking [app keeps crashing](problem_type)
+    - the phone [freezes](problem_type) when I open the camera
+    - the [phone is slow](problem_type)
+    - I am experiencing [slow performance](problem_type)
+    - it says my [storage is full](problem_type)
+    - I'm [out of space](problem_type)
+    - I am [not getting notifications](problem_type) from whatsapp
+    - I [forgot my password](problem_type)
+    - I'm [locked out](problem_type) of my phone
+    - how do i [backup my phone](problem_type)
+  
+- intent: goodbye_and_reset
+  examples: |
+    - /goodbye_and_reset
+
+# 2. SYNONYMS
 - synonym: iPhone 16 Pro
   examples: |
     - iphone 16 pro
     - 16 pro
     - i phone 16 pro
+    - IPHONE16pro
 
+- synonym: damaged
+  examples: |
+    - broken
+    - defect
+    - defective
+    - faulty
+    - shattered
+    - smashed
+    - arrived broken
+    - shipping damage
+
+- synonym: cracked_screen
+  examples: |
+    - cracked screen
+    - screen cracked
+    - shattered screen
+    - broken screen
+    - spider web screen
+    - cracked glass
+
+- synonym: scratch
+  examples: |
+    - scratched
+    - scuff
+    - scuffed
+    - mark on it
+    - deep mark
+    - cosmetic damage
+
+- synonym: wrong_color
+  examples: |
+    - incorrect color
+    - ordered blue got black
+    - sent the wrong color
+    - this is not the color i wanted
+
+- synonym: wrong_model
+  examples: |
+    - wrong phone
+    - wrong device
+    - not the model I ordered
+    - sent the wrong version
+    - not the item I purchased
+
+- synonym: battery_issue
+  examples: |
+    - battery
+    - battary
+    - batery
+    - battery problem
+    - doesn't charge
+    - charging problem
+    - dies too fast
+    - poor battery life
+    - won't hold a charge
+
+- synonym: overheating
+  examples: |
+    - heating up
+    - gets hot
+    - too hot to touch
+    - running hot
+    - heat problem
+    - heating problem
+    - overheating issue
+    - heating issue
+    - too hot to touch issue
+    - heating up issue
+
+- synonym: power_issue
+  examples: |
+    - not working
+    - won't turn on
+    - doesn't start
+    - won't power on issue
+    - is dead
+    - no power
+    - blank screen issue
+    - black screen
+    - DOA
+
+- synonym: camera_issue
+  examples: |
+    - camera problem
+    - camera not working
+    - camera is black
+    - blurry camera
+    - pictures are blurry
+    - photos are out of focus
+    - fuzzy photos
+    - camera not working issue
+    - camera performance
+    - poor camera
+
+- synonym: speaker_issue
+  examples: |
+    - no sound
+    - speaker quiet
+    - can't hear anything
+    - distorted sound
+    - audio problem
+
+- synonym: microphone_issue
+  examples: |
+    - people cant hear me
+    - mic not working
+    - voice is muffled
+    - mic problem
+
+- synonym: charging_port_issue
+  examples: |
+    - port is loose
+    - cable keeps falling out
+    - have to wiggle cable to charge
+
+- synonym: biometric_issue
+  examples: |
+    - fingerprint sensor not working
+    - face id failed
+    - can't unlock with my face
+    - fingerprint reader is broken
+
+- synonym: wifi_issue
+  examples: |
+    - no wifi
+    - can't connect to wifi
+    - wifi is slow
+    - wifi keeps dropping
+
+- synonym: bluetooth_issue
+  examples: |
+    - bluetooth not connecting
+    - can't pair headphones
+    - bluetooth pairing failed
+
+- synonym: cellular_data_issue
+  examples: |
+    - no service
+    - no internet
+    - mobile data not working
+    - 4g not working
+    - 5g is down
+
+- synonym: app_crash
+  examples: |
+    - app keeps crashing
+    - app freezes
+    - an app won't open
+    - facebook closes itself
+
+- synonym: slow_performance
+  examples: |
+    - phone is slow
+    - device is lagging
+    - my phone is so laggy
+
+- synonym: storage_full
+  examples: |
+    - storage is full
+    - out of space
+    - can't install anything
+
+- synonym: notification_issue
+  examples: |
+    - not getting notifications
+    - no alerts from an app
+    - notification problem
+
+- synonym: forgot_pin
+  examples: |
+    - forgot my password
+    - I'm locked out
+    - forgot my pattern
+    - can't unlock my phone
+
+- synonym: backup_question
+  examples: |
+    - how do I back up my phone
+    - help with icloud backup
+    - how to save my data
+
+# 3. LOOKUP TABLES
+- lookup: problem_type
+  examples: |
+    - damaged
+    - broken
+    - defect
+    - defective
+    - faulty
+    - shattered
+    - smashed
+    - cracked screen
+    - screen cracked
+    - shattered screen
+    - broken screen
+    - spider web screen
+    - cracked glass
+    - scratch
+    - scratch issue
+    - scratched
+    - scuff
+    - scuffed
+    - mark
+    - wrong color
+    - wrong color issue
+    - incorrect color
+    - wrong model
+    - wrong phone
+    - wrong model issue
+    - cracked glass issue
+    - battery
+    - battary issue
+    - batery
+    - power
+    - charging
+    - charging issue
+    - charge
+    - battery life
+    - battery life problem
+    - overheating issue
+    - overheating complaint
+    - overheating
+    - heating up
+    - gets hot
+    - running hot
+    - heat problem
+    - not working
+    - won't turn on
+    - doesn't start
+    - won't power on
+    - dead
+    - no power
+    - blank screen issue
+    - blank screen
+    - black screen
+    - black screen problem
+    - camera issue
+    - camera problem
+    - camera complaint
+    - camera not working
+    - blurry camera
+    - out of focus
+    - fuzzy photos
+    - speaker
+    - sound
+    - audio
+    - microphone
+    - mic
+    - charging port
+    - fingerprint
+    - face id
+    - wifi
+    - bluetooth
+    - pairing
+    - cellular
+    - data
+    - service
+    - 4g
+    - 5g
+    - app crash
+    - freezes
+    - slow
+    - lagging
+    - laggy
+    - storage
+    - notifications
+    - forgot pin
+    - password
+    - locked out
+    - backup
+    - icloud
+
+# 4. REGEX
 - regex: order_number_pattern
   examples: |
     - \b[A-Z]{2}[A-F0-9]{6}\b
+

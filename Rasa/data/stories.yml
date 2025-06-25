@@ -57,31 +57,31 @@ stories:
 - story: Case 5 - Get order history (email needed)
   steps:
     - intent: get_order_history
-    - action: action_get_order_history  # Bot asks for email here
+    - action: action_get_order_history  
     - intent: provide_email
       entities:
         - user_email: "test@example.com"
-    - action: action_get_order_history  # Bot now has email and provides history
+    - action: action_get_order_history  
 
 - story: Case 5 - Get order history (email already known)
   steps:
     - intent: greet
     - action: utter_greet
-    - intent: provide_email # User provides email early
+    - intent: provide_email 
       entities:
         - user_email: "test@example.com"
     - intent: get_order_history
-    - action: action_get_order_history # Bot already has email and provides history
+    - action: action_get_order_history 
 
 # CASE 7: Cancel order
 - story: Case 6 - Cancel order (number needed)
   steps:
     - intent: cancel_order
-    - action: action_cancel_order # Bot asks for order number
+    - action: action_cancel_order 
     - intent: provide_order_number
       entities:
         - order_number: "ORD1234"
-    - action: action_cancel_order # Bot now has number and cancels
+    - action: action_cancel_order
 
 - story: Case 7 - Cancel order (number provided)
   steps:
@@ -164,3 +164,166 @@ stories:
     - action: action_check_product 
     - action: order_form 
     - active_loop: order_form
+
+# complaint module
+- story: Full complaint flow where bot asks for all information step-by-step
+  steps:
+    - intent: file_complaint  
+    - action: utter_acknowledge_complaint
+    - action: action_triage_complaint  
+    - intent: file_complaint          
+      entities:
+        - problem_type: "cracked screen"
+    - action: action_triage_complaint  
+    - intent: provide_email
+      entities:
+        - user_email: "test@example.com"
+    - action: action_triage_complaint  
+    - intent: provide_order_number
+      entities:
+        - order_number: "A717C8BA"
+    - action: action_triage_complaint  
+    - action: action_log_complaint_and_escalate
+    - action: action_reset_slots 
+    - action: utter_anything_else
+
+- story: User provides problem and order number, but bot needs email
+  steps:
+    - intent: file_complaint
+      entities:
+        - problem_type: "damaged"
+        - order_number: "C2D57202"
+    - action: utter_acknowledge_complaint
+    - action: action_triage_complaint 
+    - intent: provide_email
+      entities:
+        - user_email: "jane.doe@example.com"
+    - action: action_triage_complaint 
+    - action: action_log_complaint_and_escalate
+    - action: action_reset_slots
+
+- story: User asks informational question about forgotten PIN
+  steps:
+    - intent: file_complaint
+      entities:
+        - problem_type: "forgot_pin"
+    - action: action_triage_complaint 
+    - action: action_inform_lockout
+    - action: action_reset_slots     
+    - action: utter_anything_else 
+
+- story: Full troubleshooting flow where user escalates after trying the fix
+  steps:
+    - intent: file_complaint
+      entities:
+        - problem_type: "battery"
+    - action: utter_acknowledge_complaint
+    - action: action_triage_complaint 
+    - intent: provide_email
+      entities:
+        - user_email: "test@example.com"
+    - action: action_triage_complaint 
+    - intent: provide_order_number
+      entities:
+        - order_number: "C2D57202"
+    - action: action_triage_complaint 
+    - action: action_suggest_troubleshooting
+    - intent: file_complaint          
+      entities:
+        - problem_type: "escalate"
+    - action: action_triage_complaint #
+    - action: action_log_complaint_and_escalate
+    - action: action_reset_slots
+
+- story: Full troubleshooting flow where user decides to try the fix later
+  steps:
+    - intent: file_complaint
+      entities:
+        - problem_type: "overheating"
+    - action: utter_acknowledge_complaint
+    - action: action_triage_complaint 
+    - intent: provide_email
+      entities:
+        - user_email: "test@example.com"
+    - action: action_triage_complaint 
+    - intent: provide_order_number
+      entities:
+        - order_number: "D93A45B1"
+    - action: action_triage_complaint 
+    - action: action_suggest_troubleshooting
+    - intent: goodbye_and_reset         
+    - action: action_reset_and_goodbye 
+
+- story: User cancels the complaint process midway
+  steps:
+    - intent: file_complaint
+      entities:
+        - problem_type: "battery"
+    - action: utter_acknowledge_complaint
+    - action: action_triage_complaint  
+    - intent: deny                   
+    - action: utter_order_cancelled  
+    - action: action_reset_slots      
+
+- story: User asks a question during the complaint process (Digression)
+  steps:
+    - intent: file_complaint
+      entities:
+        - problem_type: "cracked_screen"
+    - action: utter_acknowledge_complaint
+    - action: action_triage_complaint     
+    - intent: bot_challenge              
+    - action: utter_iamabot              
+    - intent: provide_email              
+      entities:
+        - user_email: "test@example.com"
+    - action: action_triage_complaint     
+    - intent: provide_order_number
+      entities:
+        - order_number: "A717C8BA"
+    - action: action_triage_complaint
+    - action: action_log_complaint_and_escalate
+    - action: action_reset_slots
+
+- story: User escalates after software troubleshooting
+  steps:
+  - intent: file_complaint
+    entities:
+      - problem_type: "slow_performance"
+  - action: utter_acknowledge_complaint
+  - action: action_triage_complaint
+  - intent: provide_email
+    entities:
+      - user_email: "test@example.com"
+  - action: action_triage_complaint
+  - intent: provide_order_number
+    entities:
+      - order_number: "D93A45B1"
+  - action: action_triage_complaint
+  - action: action_troubleshoot_software
+  - intent: file_complaint
+    entities:
+      - problem_type: "escalate"
+  - action: action_triage_complaint
+  - action: action_log_complaint_and_escalate
+  - action: action_reset_slots
+  - action: utter_anything_else
+
+- story: User says goodbye after software troubleshooting
+  steps:
+  - intent: file_complaint
+    entities:
+      - problem_type: "app_crash"
+  - action: utter_acknowledge_complaint
+  - action: action_triage_complaint
+  - intent: provide_email
+    entities:
+      - user_email: "test@example.com"
+  - action: action_triage_complaint
+  - intent: provide_order_number
+    entities:
+      - order_number: "D93A45B1"
+  - action: action_triage_complaint
+  - action: action_troubleshoot_software
+  - intent: goodbye_and_reset
+  - action: action_reset_and_goodbye

@@ -1,5 +1,4 @@
 recipe: default.v1
-assistant_id: 20250619-181744-boxy-eggs
 language: en
 
 pipeline:
@@ -32,3 +31,5 @@ policies:
   - name: TEDPolicy
     max_history: 8
     epochs: 100
+
+assistant_id: 20250619-181744-boxy-eggs

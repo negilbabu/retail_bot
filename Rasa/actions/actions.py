@@ -10,11 +10,13 @@ from rasa_sdk.events import SlotSet, SessionStarted, ActionExecuted, EventType
 from dotenv import load_dotenv
 from rasa_sdk import Action, Tracker, FormValidationAction
 from rasa_sdk.events import SlotSet, AllSlotsReset, ActiveLoop
+from rasa_sdk.events import FollowupAction
 
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
 FLASK_API_URL = os.getenv("FLASK_API_URL", "http://localhost:5000")
 EMAIL_PATTERN = re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b')
+
 
 class ActionCheckProduct(Action):
     """Checks if a product is available."""
@@ -277,14 +279,13 @@ class ActionShowAllProducts(Action):
         try:
             api_url = f"{FLASK_API_URL}/api/products"
             response = requests.get(api_url, timeout=5)
-            response.raise_for_status() # Check for API errors
+            response.raise_for_status() 
             data = response.json()
             products = data.get("products", [])
             if not products:
                 dispatcher.utter_message(response="utter_no_products_found")
                 return []
             message = "Here are all the devices we currently have:"
-            # Create a button for each product
             buttons = []
             for product in products:
                 # The button title is the product name
@@ -298,3 +299,170 @@ class ActionShowAllProducts(Action):
             logging.error(f"API Error fetching all products: {e}")
             dispatcher.utter_message(text="Sorry, I'm having trouble fetching our product list right now.")
         return []
+    
+# complaints
+
+
+class ActionTriageComplaint(Action):
+    """
+    A robust action that gathers information in a user-centric order:
+    Problem -> Email -> Order Number -> Final Action.
+    This is the only action needed to control the complaint info gathering.
+    """
+    def name(self) -> Text:
+        return "action_triage_complaint"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        physical_problems = ["damaged", "cracked_screen", "scratch", "wrong_color", "wrong_model"]
+        software_problems = ["app_crash", "slow_performance", "storage_full", "notification_issue"]
+        connectivity_problems = ["wifi_issue", "bluetooth_issue", "cellular_data_issue"]
+        audio_problems = ["speaker_issue", "microphone_issue"]
+
+        problem = tracker.get_slot("problem_type")
+        user_email = tracker.get_slot("user_email")
+        order_number = tracker.get_slot("order_number")
+
+        if not problem:
+            dispatcher.utter_message(response="utter_ask_problem_type")
+            return [] 
+        if not user_email:
+            dispatcher.utter_message(response="utter_ask_email")
+            return []
+        if not order_number:
+            dispatcher.utter_message(response="utter_ask_order_number_for_complaint")
+            return []
+        logging.info(f"Triage initiated for problem: '{problem}'")        
+        logging.info(f"Triage initiated for user '{user_email}', order '{order_number}'")
+
+        # CATEGORY A: Physical Damage or Wrong Item -> Escalate
+        if problem in physical_problems:
+            dispatcher.utter_message(text=f"I see that the issue is a physical one ('{problem}'). This requires a manual review.")
+            return [FollowupAction("action_log_complaint_and_escalate")]
+        # CATEGORY B: Software Issue -> Suggest a fix
+        elif problem in software_problems:
+            return [FollowupAction("action_troubleshoot_software")]
+        # CATEGORY C: Connectivity Issue -> Suggest a fix
+        elif problem in connectivity_problems:
+            return [FollowupAction("action_troubleshoot_connectivity")]
+        # CATEGORY D: Audio Issue -> Suggest a fix
+        elif problem in audio_problems:
+            return [FollowupAction("action_troubleshoot_audio")]
+        #Battery related problem
+        elif problem == "battery_issue" or problem == "charging_port_issue":
+            return [FollowupAction("action_troubleshoot_charging_and_battery")]
+        # Overheating related problems
+        elif problem == "overheating" or problem == "power_issue" or problem == "biometric_issue":
+            return [FollowupAction("action_suggest_troubleshooting")]
+        # Forgot pin issue
+        elif problem == "forgot_pin":
+            return [FollowupAction("action_inform_lockout")]
+        # Backup related
+        elif problem == "backup_question":
+            return [FollowupAction("action_inform_backup")]
+        else: # CATEGORY: Generic or Unknown -> Escalate
+            dispatcher.utter_message(text="To make sure this gets handled correctly, let me create a support ticket for you.")
+            return [FollowupAction("action_log_complaint_and_escalate")]
+        
+class ActionSuggestTroubleshooting(Action):
+    """Provides a generic troubleshooting step."""
+    def name(self) -> Text:
+        return "action_suggest_troubleshooting"
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        dispatcher.utter_message(response="utter_propose_troubleshooting")
+        return []
+class ActionTroubleshootConnectivity(Action):
+    def name(self) -> Text:
+        return "action_troubleshoot_connectivity"
+    def run(self, dispatcher, tracker, domain):
+        dispatcher.utter_message(response="utter_troubleshoot_connectivity")
+        return []
+
+class ActionTroubleshootSoftware(Action):
+    def name(self) -> Text:
+        return "action_troubleshoot_software"
+    def run(self, dispatcher, tracker, domain):
+        dispatcher.utter_message(response="utter_troubleshoot_software")
+        return []
+
+class ActionTroubleshootChargingAndBattery(Action):
+    def name(self) -> Text:
+        return "action_troubleshoot_charging_and_battery"
+    def run(self, dispatcher, tracker, domain):
+        dispatcher.utter_message(response="utter_troubleshoot_charging_and_battery")
+        return []
+
+class ActionTroubleshootAudio(Action):
+    def name(self) -> Text:
+        return "action_troubleshoot_audio"
+    def run(self, dispatcher, tracker, domain):
+        dispatcher.utter_message(response="utter_troubleshoot_audio")
+        return []
+
+class ActionInformLockout(Action):
+    def name(self) -> Text:
+        return "action_inform_lockout"
+    def run(self, dispatcher, tracker, domain):
+        dispatcher.utter_message(response="utter_inform_lockout")
+        return []
+
+class ActionInformBackup(Action):
+    def name(self) -> Text:
+        return "action_inform_backup"
+    def run(self, dispatcher, tracker, domain):
+        dispatcher.utter_message(response="utter_inform_backup")
+        return []
+
+class ActionLogComplaintAndEscalate(Action):
+    """Logs the complaint to the DB via API and confirms with the user."""
+    def name(self) -> Text:
+        return "action_log_complaint_and_escalate"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        user_email = tracker.get_slot("user_email")
+        order_number = tracker.get_slot("order_number")
+        complaint_text = ""
+        for event in reversed(tracker.events):
+            if (event['event'] == 'user' and 
+                event['parse_data']['intent']['name'] == 'file_complaint' and
+                not event['text'].strip().startswith('/')):
+                
+                complaint_text = event['text']
+                break 
+        if not complaint_text:
+            complaint_text = tracker.get_slot("problem_type")
+
+        complaint_data = {
+            "user_email": user_email,
+            "order_number": order_number,
+            "message": f"User complaint: '{complaint_text}'"
+        }
+        
+        try:
+            api_url = f"{FLASK_API_URL}/api/complaints"
+            response = requests.post(api_url, json=complaint_data, timeout=5)
+            response.raise_for_status()
+            complaint_id = response.json().get("complaint_id")
+
+            dispatcher.utter_message(
+                text=f"I have created a support ticket for you. Your reference ID is **{complaint_id}**. "
+                     f"Our team will review this and contact you at {user_email} as soon as possible."
+            )
+        except Exception as e:
+            logging.error(f"Failed to create complaint ticket via API: {e}")
+            dispatcher.utter_message(text="I'm sorry, there was an error creating your support ticket. Please contact us directly at support@mymobile.com")
+
+        return []
+    
+class ActionResetAndGoodbye(Action):
+    def name(self) -> Text:
+        return "action_reset_and_goodbye"
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        dispatcher.utter_message(response="utter_goodbye")
+        return [
+            SlotSet("problem_type", None),
+            SlotSet("user_email", None),
+            SlotSet("order_number", None)
+        ]

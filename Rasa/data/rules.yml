@@ -60,3 +60,10 @@ rules:
   steps:
   - intent: goodbye
   - action: utter_goodbye
+
+- rule: Handle user ending conversation after troubleshooting
+  condition:
+  - active_loop: null 
+  steps:
+  - intent: goodbye_and_reset
+  - action: action_reset_and_goodbye

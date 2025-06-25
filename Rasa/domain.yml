@@ -28,18 +28,26 @@ intents:
   - confirm_order
   - deny_order
   - get_order_history
+  - goodbye_and_reset  
   - cancel_order:
       use_entities:
         - order_number
   - provide_order_number:
       use_entities:
         - order_number
+  - file_complaint:
+        use_entities:
+          - order_number
+          - product_name
+          - problem_type
+  
 
 entities:
   - product_name
   - product_quantity
   - user_email
   - order_number
+  - problem_type
 
 slots:
   product_name:
@@ -82,6 +90,12 @@ slots:
       - type: from_trigger_intent
         intent: deny_order
         value: false
+  problem_type:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: problem_type
 
 forms:
   order_form:
@@ -101,6 +115,16 @@ actions:
   - action_reset_slots
   - validate_order_form
   - action_show_order_summary 
+  - action_triage_complaint         
+  - action_suggest_troubleshooting       
+  - action_log_complaint_and_escalate
+  - action_troubleshoot_connectivity
+  - action_troubleshoot_software
+  - action_troubleshoot_charging_and_battery
+  - action_troubleshoot_audio
+  - action_inform_lockout
+  - action_inform_backup
+  - action_reset_and_goodbye 
 
 responses:
   utter_greet:
@@ -136,6 +160,59 @@ responses:
     - text: "Here is your order summary."
   utter_no_products_found:
     - text: "It seems we don't have any products available at the moment. Please check back later!"
+  # complaints
+  utter_acknowledge_complaint:
+    - text: "I'm very sorry to hear you're having an issue with your phone. I'll do my best to help you resolve this."
+  utter_ask_order_number_for_complaint:
+    - text: "To file this complaint correctly, could you please provide the order number?"
+  utter_propose_troubleshooting:
+    - text: "Often, a simple restart can solve issues like this. Could you please try turning the phone completely off and on again? Let me know if that helps."
+      buttons:
+        - title: "That didn't help"
+          payload: '/file_complaint{"problem_type": "escalate"}'
+        - title: "I'll try later"
+          payload: /goodbye_and_reset 
+  utter_ask_problem_type:
+    - text: "I see. To categorize your complaint correctly, could you please describe the main issue in a few words? (e.g., 'cracked screen', 'battery issue', 'wrong item')"
+  utter_troubleshoot_connectivity:
+    - text: "Connectivity issues can often be solved with a few quick steps. Please try these in order:\n1. Toggle Airplane Mode on for 10 seconds, then turn it off.\n2. Restart your phone completely.\n3. If the issue persists, try resetting your phone's network settings. You can find this in Settings > General > Reset."
+      buttons:
+        - title: "That didn't help"
+          payload: '/file_complaint{"problem_type": "escalate"}'
+        - title: "I'll try later"
+          payload: /goodbye_and_reset 
+
+  utter_troubleshoot_software:
+    - text: "For slowness or app issues, a restart is often the best fix. If that doesn't help, try clearing the cache for the specific app giving you trouble (in Settings > Apps). Also, ensure both your phone's OS and the app are fully updated."
+      buttons:
+        - title: "That didn't help"
+          payload: '/file_complaint{"problem_type": "escalate"}'
+        - title: "I'll try later"
+          payload: /goodbye_and_reset 
+
+  utter_troubleshoot_charging_and_battery:
+    - text: "For battery or charging problems, first, gently check the charging port for any lint or debris. Even a tiny amount can prevent a connection. Also, please try a different charging cable and power adapter to rule out a faulty accessory."
+      buttons:
+        - title: "That didn't help"
+          payload: '/file_complaint{"problem_type": "escalate"}'
+        - title: "I'll try later"
+          payload: /goodbye_and_reset 
+
+  utter_troubleshoot_audio:
+    - text: "For speaker or microphone issues, first check that the volume is turned up and that your phone is not connected to a Bluetooth device like headphones. A simple restart can also solve many audio glitches."
+      buttons:
+        - title: "That didn't help"
+          payload: '/file_complaint{"problem_type": "escalate"}'
+        - title: "I'll try later"
+          payload: /goodbye_and_reset 
+
+  utter_inform_lockout:
+    - text: "For security, we cannot reset your device's PIN, password, or pattern. You will need to use the official account recovery service for your device (e.g., Google's 'Find My Device' or Apple's 'iCloud')."
+
+  utter_inform_backup:
+    - text: "You can back up your phone's data using the built-in cloud service (iCloud for Apple, Google Drive for Android) in your phone's settings. You can also connect your phone to a computer to perform a local backup."
+  utter_anything_else:
+    - text: "I've logged that for you. Is there anything else I can help with?"
 
 session_config:
   session_expiration_time: 60

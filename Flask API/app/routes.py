@@ -1,69 +1,15 @@
 
 import re
 from flask import Blueprint, request, jsonify
-from .models import Product, StatusEnum, User, Order
+from .models import Complaint, Product, StatusEnum, User, Order
 from app.extensions import db
 from fuzzywuzzy import fuzz  
 from sqlalchemy.exc import IntegrityError
 import logging
+from .utils import STATUS_MAP, normalize_name, find_exact_product, find_product, is_valid_email, check_user_exists
+
 
 api_blueprint = Blueprint("api", __name__)
-
-# --- Utility Functions ---
-STATUS_MAP = {
-    StatusEnum.INACTIVE: "Inactive",
-    StatusEnum.ACTIVE: "Active / In Progress", 
-    StatusEnum.COMPLETED: "Completed"
-}
-
-def normalize_name(name):
-    """Normalize product name by removing spaces and making it lowercase."""
-    return re.sub(r"\s+", "", name).lower()
-
-def find_exact_product(product_name):
-    """Find a product by normalized name ignoring spaces and case."""
-    if not product_name:
-        return None
-    normalized_input = normalize_name(product_name)
-    products = Product.query.all()
-    for product in products:
-        if normalize_name(product.product_name) == normalized_input:
-            return product
-    return None
-
-def find_product(product_name):
-    if not product_name:
-        return None
-    normalized_input = normalize_name(product_name)
-
-    # Try exact match first
-    products = Product.query.all()
-    for product in products:
-        if normalize_name(product.product_name) == normalized_input:
-            return product
-
-    # Fall back to fuzzy match
-    best_match = None
-    best_score = 0
-    for product in products:
-        score = fuzz.ratio(normalized_input, normalize_name(product.product_name))
-        if score > best_score:
-            best_score = score
-            best_match = product
-    
-    return best_match if best_score > 85 else None
-
-def is_valid_email(email):
-    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-    return re.match(pattern, email) is not None
-
-def check_user_exists(email):
-    user = User.query.filter(User.email.ilike(f'%{email}%')).first()
-    if not user:
-        user = User(email=email)
-        db.session.add(user)
-    db.session.commit()
-    return user.id
 
 @api_blueprint.route('/api/product_stock', methods=['GET'])
 def product_stock():
@@ -174,9 +120,6 @@ def order_history():
 
 @api_blueprint.route('/api/cancel_order', methods=['POST'])
 def cancel_order():
-    """
-    Validates and cancels an order, combining business logic with robust error handling.
-    """
     try:
         data = request.get_json()
         if not data:
@@ -216,9 +159,6 @@ def cancel_order():
 
 @api_blueprint.route('/api/products', methods=['GET'])
 def get_all_products():
-    """
-    Retrieves a list of all products from the database.
-    """
     try:
         products_from_db = Product.query.all()
         if not products_from_db:
@@ -234,3 +174,71 @@ def get_all_products():
     except Exception as e:
         logging.error(f"[GET_ALL_PRODUCTS] An unexpected error occurred: {e}")
         return {"error": "A server error occurred while fetching products."}, 500
+    
+
+@api_blueprint.route('/api/complaints', methods=['POST'])
+def create_complaint():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Request body must contain valid JSON"}), 400
+        user_email = data.get('user_email')
+        order_number = data.get('order_number')
+        message = data.get('message')
+        if not all([user_email, order_number, message]):
+            return jsonify({"error": "Missing required fields: user_email, order_number, and message"}), 400
+        # Find the user by email
+        user_id = check_user_exists(email=user_email)
+        if not user_id:
+            return jsonify({"error": f"User with email '{user_email}' not found"}), 404
+        # Find the order by order_number and ensure it belongs to the user
+        order = Order.query.filter_by(order_number=order_number, user_id=user_id).first()
+        if not order:
+            return jsonify({"error": f"Order #{order_number} not found for this user"}), 404
+        new_complaint = Complaint(
+            message=message,
+            user_id=user_id,
+            order_id=order.id,
+            status=StatusEnum.ACTIVE 
+        )
+        db.session.add(new_complaint)
+        db.session.commit()
+        logging.info(f"New complaint created with ID {new_complaint.id} for order #{order_number}")
+        
+        return jsonify({
+            "status": "success",
+            "message": "Complaint successfully filed.",
+            "complaint_id": new_complaint.id
+        }), 201 
+
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"[CREATE_COMPLAINT] An unexpected error occurred: {e}")
+        return jsonify({"error": "An internal server error occurred"}), 500
+    
+@api_blueprint.route('/api/complaints', methods=['GET'])
+def get_complaints():
+
+    user_email = request.args.get('user_email')
+    if not user_email:
+        return jsonify({"error": "Missing required query parameter: user_email"}), 400
+
+    # Find the user by email
+    user_id = check_user_exists(email=user_email)
+    if not user_id:
+        # If the user doesn't exist, they have no complaints. Return an empty list.
+        return jsonify({"complaints": []}), 200
+    # Find all complaints for this user, ordered by most recent first
+    complaints = Complaint.query.filter_by(user_id=user_id).order_by(Complaint.created_at.desc()).all()
+    complaints_list = []
+    for c in complaints:
+        complaints_list.append({
+            "complaint_id": c.id,
+            "order_number": c.order.order_number, 
+            "message": c.message,
+            "answer": c.answer,
+            "status": c.status.name, 
+            "filed_at": c.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        })
+    return jsonify({"complaints": complaints_list}), 200
+
