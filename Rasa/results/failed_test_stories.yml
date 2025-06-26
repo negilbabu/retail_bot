@@ -1,0 +1,148 @@
+version: "3.1"
+stories:
+- story: Full troubleshooting flow where user escalates after trying the fix (data\stories.yml)
+  steps:
+  - intent: file_complaint
+    entities:
+    - problem_type: battery
+  - slot_was_set:
+    - problem_type: battery
+  - action: utter_acknowledge_complaint  # predicted: action_triage_complaint
+  - action: action_triage_complaint
+  - intent: provide_email
+    entities:
+    - user_email: test@example.com
+  - slot_was_set:
+    - user_email: test@example.com
+  - action: action_triage_complaint
+  - intent: provide_order_number
+    entities:
+    - order_number: C2D57202
+  - slot_was_set:
+    - order_number: C2D57202
+  - action: action_triage_complaint
+  - action: action_suggest_troubleshooting
+  - intent: file_complaint
+    entities:
+    - problem_type: escalate
+  - slot_was_set:
+    - problem_type: escalate
+  - action: action_triage_complaint
+  - action: action_log_complaint_and_escalate
+  - action: action_reset_slots
+- story: Full troubleshooting flow where user decides to try the fix later (data\stories.yml)
+  steps:
+  - intent: file_complaint
+    entities:
+    - problem_type: overheating
+  - slot_was_set:
+    - problem_type: overheating
+  - action: utter_acknowledge_complaint  # predicted: action_triage_complaint
+  - action: action_triage_complaint
+  - intent: provide_email
+    entities:
+    - user_email: test@example.com
+  - slot_was_set:
+    - user_email: test@example.com
+  - action: action_triage_complaint
+  - intent: provide_order_number
+    entities:
+    - order_number: D93A45B1
+  - slot_was_set:
+    - order_number: D93A45B1
+  - action: action_triage_complaint
+  - action: action_suggest_troubleshooting
+  - intent: goodbye_and_reset
+  - action: action_reset_and_goodbye
+- story: User cancels the complaint process midway (data\stories.yml)
+  steps:
+  - intent: file_complaint
+    entities:
+    - problem_type: battery
+  - slot_was_set:
+    - problem_type: battery
+  - action: utter_acknowledge_complaint  # predicted: action_triage_complaint
+  - action: action_triage_complaint
+  - intent: deny
+  - action: utter_order_cancelled
+  - action: action_reset_slots
+- story: User asks a question during the complaint process (Digression) (data\stories.yml)
+  steps:
+  - intent: file_complaint
+    entities:
+    - problem_type: cracked_screen
+  - slot_was_set:
+    - problem_type: cracked_screen
+  - action: utter_acknowledge_complaint  # predicted: action_triage_complaint
+  - action: action_triage_complaint
+  - intent: bot_challenge
+  - action: utter_iamabot
+  - intent: provide_email
+    entities:
+    - user_email: test@example.com
+  - slot_was_set:
+    - user_email: test@example.com
+  - action: action_triage_complaint
+  - intent: provide_order_number
+    entities:
+    - order_number: A717C8BA
+  - slot_was_set:
+    - order_number: A717C8BA
+  - action: action_triage_complaint
+  - action: action_log_complaint_and_escalate
+  - action: action_reset_slots
+- story: User escalates after software troubleshooting (data\stories.yml)
+  steps:
+  - intent: file_complaint
+    entities:
+    - problem_type: slow_performance
+  - slot_was_set:
+    - problem_type: slow_performance
+  - action: utter_acknowledge_complaint  # predicted: action_triage_complaint
+  - action: action_triage_complaint
+  - intent: provide_email
+    entities:
+    - user_email: test@example.com
+  - slot_was_set:
+    - user_email: test@example.com
+  - action: action_triage_complaint
+  - intent: provide_order_number
+    entities:
+    - order_number: D93A45B1
+  - slot_was_set:
+    - order_number: D93A45B1
+  - action: action_triage_complaint
+  - action: action_troubleshoot_software  # predicted: action_suggest_troubleshooting
+  - intent: file_complaint
+    entities:
+    - problem_type: escalate
+  - slot_was_set:
+    - problem_type: escalate
+  - action: action_triage_complaint
+  - action: action_log_complaint_and_escalate
+  - action: action_reset_slots
+  - action: utter_anything_else
+- story: User says goodbye after software troubleshooting (data\stories.yml)
+  steps:
+  - intent: file_complaint
+    entities:
+    - problem_type: app_crash
+  - slot_was_set:
+    - problem_type: app_crash
+  - action: utter_acknowledge_complaint  # predicted: action_triage_complaint
+  - action: action_triage_complaint
+  - intent: provide_email
+    entities:
+    - user_email: test@example.com
+  - slot_was_set:
+    - user_email: test@example.com
+  - action: action_triage_complaint
+  - intent: provide_order_number
+    entities:
+    - order_number: D93A45B1
+  - slot_was_set:
+    - order_number: D93A45B1
+  - action: action_triage_complaint
+  - action: action_troubleshoot_software  # predicted: action_suggest_troubleshooting
+  - intent: goodbye_and_reset
+  - action: action_reset_and_goodbye

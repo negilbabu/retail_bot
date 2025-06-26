@@ -2,34 +2,26 @@ recipe: default.v1
 language: en
 
 pipeline:
-  # 1. Tokenizer
-  - name: WhitespaceTokenizer
-  # 2. Featurizers for intent classification and entity extraction
-  - name: RegexFeaturizer
-  - name: LexicalSyntacticFeaturizer
-  - name: CountVectorsFeaturizer
-  - name: CountVectorsFeaturizer
-    analyzer: char_wb
-    min_ngram: 1
-    max_ngram: 4
-
-  # 4. The main NLU model
-  - name: DIETClassifier
+  - name: WhitespaceTokenizer # splits the user's input into individual words based on whitespace  
+  - name: RegexFeaturizer #  Featurizers for intent classification and entity extraction
+  - name: LexicalSyntacticFeaturizer #for gramatical structure
+  - name: CountVectorsFeaturizer # convert text into a vector representation based on the frequency of words
+  - name: CountVectorsFeaturizer # this is another CountVectorsFeaturizer, but configured to use character n-grams
+    analyzer: char_wb  # specifies that character n-grams within word boundaries should be used
+    min_ngram: 1 # set the minimum length of character n-grams to 1
+    max_ngram: 4 # set the maximum length of character n-grams to 4
+  - name: DIETClassifier #  The main NLU model predicts both the user's intent and extracts entities from the text
     epochs: 100
-  # 5. Post-processors for entities
-  - name: EntitySynonymMapper
-  # 6. For handling FAQs or chit-chat
-  - name: ResponseSelector
+  - name: EntitySynonymMapper #  Post-processors for entities
+  - name: ResponseSelector   #  For handling FAQs or chit-chat
     epochs: 100
-
 policies:
-  - name: RulePolicy
+  - name: RulePolicy #This policy enforces the rules defined in rules.yml, which handle fixed behaviors for specific intents or situations
     core_fallback_threshold: 0.4
     core_fallback_action_name: "action_default_fallback"
     enable_fallback_prediction: true
-  - name: MemoizationPolicy
-  - name: TEDPolicy
+  - name: MemoizationPolicy   #This policy remembers past conversations and if the current conversation exactly matches a previous one
+  - name: TEDPolicy  #can handle unexpected conversation path
     max_history: 8
     epochs: 100
-
 assistant_id: 20250619-181744-boxy-eggs

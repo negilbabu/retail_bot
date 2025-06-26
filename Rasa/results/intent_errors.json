@@ -1,0 +1,26 @@
+[
+  {
+    "text": "i want to purchase a phone",
+    "intent": "inquire_purchase",
+    "intent_prediction": {
+      "name": "buy_product",
+      "confidence": 0.6491780877113342
+    }
+  },
+  {
+    "text": "i'd like to place an order",
+    "intent": "inquire_purchase",
+    "intent_prediction": {
+      "name": "buy_product",
+      "confidence": 0.48941880464553833
+    }
+  },
+  {
+    "text": "i want to buy",
+    "intent": "inquire_purchase",
+    "intent_prediction": {
+      "name": "buy_product",
+      "confidence": 0.6440903544425964
+    }
+  }
+]

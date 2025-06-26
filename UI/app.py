@@ -1,103 +1,93 @@
 import streamlit as st
 import requests
-import json
 import uuid
 
-# Your Rasa server's webhook URL
-rasa_endpoint = "http://localhost:5005/webhooks/rest/webhook"
-
-# --- Streamlit Page Configuration ---
-st.set_page_config(page_title="MobiAssist", layout="wide")
-st.title("MobiAssist 🤖")
-
-# --- Initialize Session State ---
-# This ensures Streamlit remembers the conversation history and user ID across reruns.
+st.set_page_config(page_title="Chat with Bot", page_icon="🤖")
+st.title("📱MobiAssist 🤖")
+st.subheader("Your virtual assistant")
+# --- Session State Initialization ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "sender_id" not in st.session_state:
     st.session_state.sender_id = str(uuid.uuid4())
-# This will hold the buttons from the bot's last message
-if "buttons" not in st.session_state:
-    st.session_state.buttons = []
+if "show_buttons" not in st.session_state:
+    st.session_state.show_buttons = True
 
-# --- Display Past Chat Messages ---
-# This loop runs every time the script reruns, showing the full conversation.
+# --- Rasa Endpoint ---
+rasa_endpoint = "http://localhost:5005/webhooks/rest/webhook"
+
+# --- Display Messages ---
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# --- Handle User Text Input ---
-# This block only runs when the user types a message in the chat box and presses Enter.
-if prompt := st.chat_input("Ask me about phones or file a complaint..."):
-    # Add the user's typed message to the history and display it
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-
-    # Send the message to the Rasa server
-    payload = {
-        "sender": st.session_state.sender_id,
-        "message": prompt
-    }
-    try:
-        response = requests.post(rasa_endpoint, json=payload)
-        response.raise_for_status()
-        rasa_response = response.json()
-
-        # Clear any buttons from the previous turn
-        st.session_state.buttons = []
-        
-        # Process and display the bot's response(s)
-        for resp in rasa_response:
-            bot_message = resp.get("text")
-            if bot_message:
-                st.session_state.messages.append({"role": "assistant", "content": bot_message})
-                with st.chat_message("assistant"):
-                    st.markdown(bot_message)
-            
-            # If the response contains buttons, save them to be displayed later
-            if resp.get("buttons"):
-                st.session_state.buttons.extend(resp["buttons"])
-
-    except requests.exceptions.RequestException as e:
-        st.error(f"Error connecting to Rasa server: {e}")
-
-# --- Handle and Display Buttons ---
-# This block runs every time, checking if there are buttons that need to be displayed.
-if st.session_state.buttons:
-    # Use columns to lay out the buttons horizontally
-    cols = st.columns(len(st.session_state.buttons))
-    for i, button in enumerate(st.session_state.buttons):
+# --- Show Buttons on First Load or Refresh ---
+if st.session_state.show_buttons:
+    buttons = [
+        {"title": "Browse Products", "payload": "what all devices do you have?"},
+        {"title": "File Complaint", "payload": "I want to make a complaint"},
+        {"title": "Track Orders", "payload": "show my order history"}
+    ]
+    cols = st.columns(len(buttons))
+    for i, button in enumerate(buttons):
         with cols[i]:
-            # Each button is created here. When a user clicks one, st.button() returns True.
             if st.button(button["title"], key=f"button_{i}"):
-                # When a button is clicked:
-                # 1. Add the button's title to the chat history to show the user's choice
-                st.session_state.messages.append({"role": "user", "content": button["title"]})
-                
-                # 2. Send the button's payload to Rasa
-                payload = {
-                    "sender": st.session_state.sender_id,
-                    "message": button["payload"]
-                }
+                # Append user message
+                st.session_state.messages.append({
+                    "role": "user", 
+                    "content": button["title"]
+                })
+
+                # Call Rasa
                 try:
-                    response = requests.post(rasa_endpoint, json=payload)
+                    response = requests.post(rasa_endpoint, json={
+                        "sender": st.session_state.sender_id,
+                        "message": button["payload"]
+                    })
                     response.raise_for_status()
-                    rasa_response = response.json()
-                    
-                    # 3. Clear the buttons so they disappear after being clicked
-                    st.session_state.buttons = []
-                    
-                    # 4. Process the new response from Rasa
-                    for resp in rasa_response:
-                        bot_message = resp.get("text")
-                        if bot_message:
-                            st.session_state.messages.append({"role": "assistant", "content": bot_message})
-                        if resp.get("buttons"):
-                            st.session_state.buttons.extend(resp["buttons"])
-
+                    for r in response.json():
+                        if "text" in r:
+                            st.session_state.messages.append({
+                                "role": "assistant",
+                                "content": r["text"]
+                            })
                 except requests.exceptions.RequestException as e:
-                    st.error(f"Error connecting to Rasa server: {e}")
+                    st.error(f"Error: {e}")
 
-                # 5. Rerun the script to immediately display the new messages
+                # Hide buttons after interaction
+                st.session_state.show_buttons = False
                 st.rerun()
+
+# --- Chat Input ---
+prompt = st.chat_input("Message CineBot...")
+
+if prompt:
+    st.session_state.messages.append({"role": "user", "content": prompt})
+
+    try:
+        response = requests.post(rasa_endpoint, json={
+            "sender": st.session_state.sender_id,
+            "message": prompt
+        })
+        response.raise_for_status()
+        for r in response.json():
+            if "text" in r:
+                st.session_state.messages.append({
+                    "role": "assistant",
+                    "content": r["text"]
+                })
+    except requests.exceptions.RequestException as e:
+        st.error(f"Error: {e}")
+
+    # Hide buttons after any user input
+    st.session_state.show_buttons = False
+    st.rerun()
+
+# --- Initial Assistant Message (Only First Load) ---
+if not st.session_state.messages:
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": "Hello! How can I help you with our products today?"
+    })
+    st.session_state.show_buttons = True
+    st.rerun()

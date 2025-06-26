@@ -1,0 +1,138 @@
+[
+  {
+    "text": "Is 16 pro available?",
+    "entities": [
+      {
+        "start": 3,
+        "end": 9,
+        "value": "16 pro",
+        "entity": "product_name"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "product_quantity",
+        "start": 3,
+        "end": 9,
+        "confidence_entity": 0.40358853340148926,
+        "value": "iPhone 16 Pro",
+        "extractor": "DIETClassifier",
+        "processors": [
+          "EntitySynonymMapper"
+        ]
+      }
+    ]
+  },
+  {
+    "text": "I want to cancel my order with order number A717C8BA",
+    "entities": [
+      {
+        "start": 44,
+        "end": 52,
+        "value": "A717C8BA",
+        "entity": "order_number",
+        "role": "order_number_pattern"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "order_number",
+        "start": 44,
+        "end": 52,
+        "confidence_entity": 0.9971665740013123,
+        "value": "A717C8BA",
+        "extractor": "DIETClassifier",
+        "processors": [
+          "EntitySynonymMapper"
+        ]
+      }
+    ]
+  },
+  {
+    "text": "my order arrived with a cracked screen",
+    "entities": [],
+    "predicted_entities": [
+      {
+        "entity": "problem_type",
+        "start": 24,
+        "end": 38,
+        "confidence_entity": 0.5943703055381775,
+        "value": "cracked_screen",
+        "extractor": "DIETClassifier",
+        "processors": [
+          "EntitySynonymMapper"
+        ]
+      }
+    ]
+  },
+  {
+    "text": "My phone's speaker has [no sound]",
+    "entities": [],
+    "predicted_entities": [
+      {
+        "entity": "problem_type",
+        "start": 24,
+        "end": 32,
+        "confidence_entity": 0.6078396439552307,
+        "value": "speaker_issue",
+        "extractor": "DIETClassifier",
+        "processors": [
+          "EntitySynonymMapper"
+        ]
+      }
+    ]
+  },
+  {
+    "text": "this is not the color i wanted",
+    "entities": [
+      {
+        "start": 8,
+        "end": 30,
+        "value": "not the color i wanted",
+        "entity": "problem_type"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "problem_type",
+        "start": 5,
+        "end": 30,
+        "confidence_entity": 0.5667569041252136,
+        "value": "is not the color i wanted",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "it says my storage is full",
+    "entities": [
+      {
+        "start": 11,
+        "end": 26,
+        "value": "storage is full",
+        "entity": "problem_type"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "problem_type",
+        "start": 8,
+        "end": 10,
+        "confidence_entity": 0.6080604195594788,
+        "value": "my",
+        "extractor": "DIETClassifier"
+      },
+      {
+        "entity": "problem_type",
+        "start": 11,
+        "end": 26,
+        "confidence_entity": 0.9988178610801697,
+        "value": "storage_full",
+        "extractor": "DIETClassifier",
+        "processors": [
+          "EntitySynonymMapper"
+        ]
+      }
+    ]
+  }
+]
