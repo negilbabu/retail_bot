@@ -44,11 +44,12 @@ class ActionCheckProduct(Action):
                 dispatcher.utter_message(text=message)
             except Exception as e:
                 logging.error(f"Error: {str(e)}")
-                message = f"Sorry, I'm having trouble accessing product information."
+                message = f"Sorry, I'm facing trouble accessing product information."
                 dispatcher.utter_message(text=message)
                 return []
         else:
-            dispatcher.utter_message(text="I couldn't identify the product you're asking about.")
+            # dispatcher.utter_message(text="I couldn't identify the product you're asking about.")
+            dispatcher.utter_message(response=utter_ask_product_name)
         return []
 
 class ActionGetPrice(Action):

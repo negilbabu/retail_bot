@@ -85,6 +85,18 @@ nlu:
 - intent: ask_all_products
   examples: |
     - what all devices do you have?
+    - what all products you have?
+    - Which are the available products?
+    - What are the devices you have?
+    - List all products
+    - all products
+    - show all products
+    - display all devices
+    - show all devices
+    - show all phones
+    - list all phones
+    - Which are the available products
+    - Which all products available in the store
     - show me all your products
     - list all available phones
     - what do you sell?

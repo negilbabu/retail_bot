@@ -168,7 +168,8 @@ def get_all_products():
         products_list = [
             {"product_name": p.product_name, "price": str(p.price)}
             for p in products_from_db
-        ]
+        ][:5]
+
         logging.info(f"Returning {len(products_list)} products.")
         return jsonify({"products": products_list}), 200
     except Exception as e:
