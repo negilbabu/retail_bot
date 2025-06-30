@@ -1,4 +1,4 @@
-# RetailBot: A Sophisticated Chatbot for Online mMobile Shotp
+# RetailBot: A Sophisticated Chatbot for Online Mobile Shop
 
 
 This repository contains the source code for **MobiAssist**, a sophisticated, AI-powered chatbot designed to enhance customer interaction within an online mobile phone store retail environment. Built using the Rasa Open Source framework, this project demonstrates a comprehensive approach to chatbot development, from NLU data creation and dialogue management to backend integration and front-end user interface design.
